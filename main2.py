@@ -1,16 +1,20 @@
-import matplotlib.pyplot as plt
+import sys
+from prophet import Prophet
+import pandas as pd
+from pathlib import Path
 
-# Sample data
-x = [1, 2, 3, 4, 5]
-y = [2, 4, 6, 8, 10]
+sales_filename = Path("C:\\Users\\User\\Desktop\\SALES_FOLDER\\45628_sales.csv")
 
-# Plot the data
-plt.plot(x, y)
 
-# Add labels and title
-plt.xlabel('X-axis label')
-plt.ylabel('Y-axis label')
-plt.title('Title of the plot')
+df = pd.read_csv(sales_filename, sep=",", parse_dates=["ds"], dayfirst=True)
 
-# Show the plot
-plt.show()
+m = Prophet()
+m.fit(df)
+future = m.make_future_dataframe(periods=30)
+forecast = m.predict(future)
+
+sales_filename_forecast = sales_filename.parent / (sales_filename.stem + "_forecast.csv")
+
+forecast.to_csv(sales_filename_forecast, index=False, columns=['ds', 'yhat'])
+
+
