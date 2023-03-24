@@ -8,7 +8,7 @@ def save_data(d, f):
     d.to_csv(f, index=False)
 
 
-horizon = str(sys.argv[1])
+horizon = int(sys.argv[1])
 dates = str(sys.argv[2]).split(",")
 sales = [int(s) for s in str(sys.argv[3]).split(",")]
 frequency = "D"
