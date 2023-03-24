@@ -1,3 +1,4 @@
+import os
 import sys
 from prophet import Prophet
 import pandas as pd
@@ -12,7 +13,6 @@ def save_data(d, f):
     d.to_csv(f, index=False)
 
 
-#filename = "C:\\Users\\User\\Desktop\\sales_day.csv"
 folder = "C:\\Users\\User\\Desktop\\"
 
 horizon = int(sys.argv[1])
@@ -30,5 +30,10 @@ forecast = model.predict(future)
 
 forecast.rename(columns={'yhat': 'y'}, inplace=True)
 
-print_data(forecast[["ds", "y"]], horizon)
+# print_data(forecast[["ds", "y"]], horizon)
 save_data(forecast[["ds", "y"]].tail(horizon), forecast_file)
+
+if os.path.exists(forecast_file):
+    print("SUCCESS")
+else:
+    print("FAIL")
