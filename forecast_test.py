@@ -1,39 +1,34 @@
-import os
-import sys
-from prophet import Prophet
+# import required libraries
 import pandas as pd
+from neuralprophet import NeuralProphet
 
+# load the data from the CSV file
+df = pd.read_csv("C:\\Users\\User\\Desktop\\sales_day.csv", parse_dates=["ds"])
 
-def print_data(d, n):
-    pd.set_option('display.max_rows', None)
-    print(d.tail(n))
+# convert the "ds" column to datetime format
 
+# define the NeuralProphet model
+model = NeuralProphet(
+    learning_rate=0.01,
+    yearly_seasonality=True,
+    weekly_seasonality=True,
+    daily_seasonality=True,
+    seasonality_mode="multiplicative",
+    normalize="auto",
+    num_hidden_layers=3,
+    d_hidden=32,
+    trend_reg=0.1,
+    seasonality_reg=0.1,
+    ar_reg=0.1,
+    loss_func="huber"
+)
 
-def save_data(d, f):
-    d.to_csv(f, index=False)
+# fit the model to the sales data
+metrics = model.fit(df, freq="D", epochs=1000)
 
-
-folder = "C:\\Users\\User\\Desktop\\"
-
-horizon = int(sys.argv[1])
-sales_file = folder + str((sys.argv[2]))
-forecast_file = folder + str((sys.argv[3]))
-frequency = str((sys.argv[4]))
-
-data = pd.read_csv(sales_file, parse_dates=["ds"])
-
-model = Prophet()
-model.fit(data)
-
-future = model.make_future_dataframe(periods=horizon, freq=frequency, include_history=True)
+# make predictions for the next 30 days
+future = model.make_future_dataframe(df, periods=30)
 forecast = model.predict(future)
 
-forecast.rename(columns={'yhat': 'y'}, inplace=True)
-
-# print_data(forecast[["ds", "y"]], horizon)
-save_data(forecast[["ds", "y"]].tail(horizon), forecast_file)
-
-if os.path.exists(forecast_file):
-    print("SUCCESS")
-else:
-    print("FAIL")
+# print the forecasted values for the next 30 days
+print(forecast.tail(30))
